@@ -3,3 +3,5 @@
 
 http://sim.okawa-denshi.jp/en/Sallen3tool.php
 
+
+![schematic](schematic.png?raw=true "Schematic")
