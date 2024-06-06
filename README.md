@@ -4,7 +4,7 @@
 http://sim.okawa-denshi.jp/en/Sallen3tool.php
 
 
-![pico_schematic](pico_schematic?raw=true "Schematic") 
+![pico_schematic](pico_schemati.png?raw=true "Schematic") 
 
 ![schematic](schematic.png?raw=true "Schematic")
 
