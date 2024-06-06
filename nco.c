@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include "ssd1306.h"
+
 
 #define ALARM_NUM 0
 #define ALARM_IRQ TIMER_IRQ_0
@@ -43,7 +45,8 @@ static volatile uint16_t fcw = 328;
 
 static volatile uint16_t accumulator = 0x0;
 
-static volatile int state = 0;
+
+ssd1306_t disp;
 
 static void alarm_irq(void) {
     unsigned char amplitude;
@@ -57,8 +60,6 @@ static void alarm_irq(void) {
     pwm_set_gpio_level(PIN_START,128 + amplitude);
     pwm_set_gpio_level(PIN_START+1,128 - amplitude);
 
-    gpio_put(PIN_START+2, state);
-    state ^= 0x01;
     timer_hw->alarm[ALARM_NUM]= timer_hw->timerawl + DELAYUS;
 }
 
@@ -94,18 +95,40 @@ void init_pwm() {
 }
 
 
+void setup_gpios(void) {
+  i2c_init(i2c1, 400000);
+  gpio_set_function(4, GPIO_FUNC_I2C);
+  gpio_set_function(5, GPIO_FUNC_I2C);
+  gpio_pull_up(2);
+  gpio_pull_up(3);  
+}
+
+
+void init_display() {
+  disp.external_vcc=false;
+  ssd1306_init(&disp, 128, 64, 0x3C, i2c1);
+  ssd1306_clear(&disp);
+
+}
+
+void display_freq() {
+  char frequency_string[15];
+  ssd1306_clear(&disp);
+  sprintf(frequency_string, "%d", frequency);
+  ssd1306_draw_string(&disp, 8, 24, 2, frequency_string);
+  ssd1306_show(&disp);
+}
+
+
 int main() {
   stdio_init_all();
 
-  gpio_init(PIN_START+2);
-  gpio_set_dir(PIN_START+2, GPIO_OUT);
-  gpio_put(PIN_START+2, state);
+  setup_gpios();
 
   init_pwm();
   alarm_in_us();
   while (true) {
     int command = getchar_timeout_us(0);
-    char frequency_string[100];
     if (command != PICO_ERROR_TIMEOUT) {
       printf("command: %c\r\n", command);
       switch (command) {
@@ -120,6 +143,7 @@ int main() {
         }
         printf("terminate: %c\r\n");
         printf("frequency: %u Hz\r\n", frequency);
+        display_freq();
         fcw =  ((float)frequency) * 65536.0 / 100000.0;
         break;
       default:
