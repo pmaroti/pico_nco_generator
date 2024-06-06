@@ -1,4 +1,7 @@
 
+#define I2C0_SDA 12
+#define I2C0_SCL 13
+
 #include "pico/stdlib.h"
 #include "hardware/timer.h"
 #include "hardware/irq.h"
@@ -7,12 +10,16 @@
 #include <stdio.h>
 
 #include "ssd1306.h"
+#include "si5351.h"
 
 
 #define ALARM_NUM 0
 #define ALARM_IRQ TIMER_IRQ_0
 #define PIN_START 6
 #define DELAYUS 10
+
+/* I2C0 pins */
+
 
 /*
 
@@ -120,10 +127,26 @@ void display_freq() {
 }
 
 
+void setup_si5351() {
+  si5351_init(0x60, SI5351_CRYSTAL_LOAD_8PF, 26000000, 0, i2c1); // I am using a 26 MHz TCXO
+  si5351_set_clock_pwr(SI5351_CLK0, 0); // safety first
+
+  si5351_drive_strength(SI5351_CLK1, SI5351_DRIVE_8MA);
+  si5351_drive_strength(SI5351_CLK2, SI5351_DRIVE_8MA);
+
+  si5351_set_freq(14074000ULL * 100ULL, SI5351_CLK1);
+  si5351_output_enable(SI5351_CLK0, 0); // TX off
+  si5351_output_enable(SI5351_CLK1, 1); // RX on
+  si5351_output_enable(SI5351_CLK2, 1); // RX IF on  
+}
+
+
 int main() {
   stdio_init_all();
 
   setup_gpios();
+
+  setup_si5351();
 
   init_pwm();
   alarm_in_us();

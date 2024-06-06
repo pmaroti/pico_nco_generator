@@ -8,6 +8,7 @@ pico_sdk_init()
 add_executable(${PROJECT_NAME}
         nco.c
         ssd1306.c
+        si5351.c
         )
 
 # pull in common dependencies
