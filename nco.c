@@ -11,6 +11,8 @@
 
 #include "ssd1306.h"
 #include "si5351.h"
+#include "rotary_enc.h"
+
 
 
 #define ALARM_NUM 0
@@ -141,12 +143,18 @@ void setup_si5351() {
 }
 
 
+void setup_rotary_encoder() {
+  rotary_init(pio0, 0, 1, 0);
+}
+
+
 int main() {
   stdio_init_all();
 
   setup_gpios();
 
   setup_si5351();
+  setup_rotary_encoder();
 
   init_pwm();
   alarm_in_us();
@@ -166,13 +174,19 @@ int main() {
         }
         printf("terminate: %c\r\n");
         printf("frequency: %u Hz\r\n", frequency);
-        display_freq();
         fcw =  ((float)frequency) * 65536.0 / 100000.0;
+        display_freq();
         break;
       default:
         printf("f [frequency]\r\n");
         break;
       }
+    }
+    if (poll_rotary()) {
+      frequency += (get_rotation()*10);
+      set_rotation(0);
+      fcw =  ((float)frequency) * 65536.0 / 100000.0;
+      display_freq();
     }
     sleep_us(1000);
   }

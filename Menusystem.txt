@@ -1,0 +1,18 @@
+display:
+
+128x64 pixel
+8x6 character
+21 column x 8 row
+
+Initial:
+.AUDIO_FR:.10000.....    ; 0-10000
+.RF_0:.127,040,443...    ; 8,000-200,000,000
+.RF_1:.127,040,443...    ; 8,000-200,000,000
+.RF_0:.127,040,443...    ; 8,000-200,000,000
+.RF_0_MODE_0:...AM...    ; OFF/RF/AM/BPSK/QPSK
+.RF_1_MODE_0:...AM...    ; OFF/RF/FSK
+.RF_2_MODE_0:...AM...    ; OFF/RF/FSK
+.ADC_0: 2455.........    ;
+.ADC_1: 2654.........    ;
+
+
