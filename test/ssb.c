@@ -13,7 +13,6 @@
 
 #define LLL 64
 
-
 typedef struct q_cmplx16 {
     int16_t real;
     int16_t imag;
